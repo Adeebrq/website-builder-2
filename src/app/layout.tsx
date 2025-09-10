@@ -1,0 +1,20 @@
+import "../index.css";
+import type { Metadata } from "next";
+import Providers from "./providers";
+
+export const metadata: Metadata = {
+  title: "Adeeb Portfolio",
+  description: "Personal portfolio",
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  );
+}
+
+
