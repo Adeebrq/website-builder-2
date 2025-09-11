@@ -86,7 +86,7 @@ const Hero = ({ clientDetails }: HeroProps) => {
             </a>
             
             <a 
-              href={clientDetails.socialLinks.instagram}
+              href= {`https://www.instagram.com/${clientDetails.instagram}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-card hover:bg-secondary transition-colors"

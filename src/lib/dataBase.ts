@@ -51,6 +51,7 @@ export const createTables = async () => {
             -- Profile Assets
             avatar_url TEXT,
             template TEXT DEFAULT 'v1',
+            color_preference TEXT DEFAULT 'purple',
             
             -- Embedded Posts (JSONB for structured data)
             instagram_posts TEXT[],

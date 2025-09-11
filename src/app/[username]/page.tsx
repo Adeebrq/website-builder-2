@@ -7,6 +7,8 @@ import LinkedInFeed from "@/components/portfolio/LinkedInFeed";
 import ContactForm from "@/components/portfolio/ContactForm";
 import Footer from "@/components/portfolio/Footer";
 import { useParams } from "next/navigation";
+import { applyTheme } from "@/lib/colorThemes";
+import type { ColorTheme } from "@/lib/colorThemes";
 
 // Define the user data type
 interface UserData {
@@ -28,6 +30,7 @@ interface UserData {
   linkedin_posts: any[] | null;
   created_at: string;
   updated_at: string;
+  color_preference?: ColorTheme | null;
 }
 
 export default function UserPortfolio() {
@@ -71,6 +74,12 @@ export default function UserPortfolio() {
       fetchUserData();
     }
   }, [username]);
+
+  // Apply user's saved theme color (must be before any early returns to keep hook order stable)
+  useEffect(() => {
+    const color = (userData?.color_preference as ColorTheme) || 'purple';
+    applyTheme(color);
+  }, [userData?.color_preference]);
 
   if (loading) {
     return (

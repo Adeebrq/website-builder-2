@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Providers from "./providers";
 
 export const metadata: Metadata = {
-  title: "Adeeb Portfolio",
+  title: "Personal portfolio",
   description: "Personal portfolio",
 };
 

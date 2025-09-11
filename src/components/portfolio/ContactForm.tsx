@@ -38,13 +38,26 @@ const ContactForm = ({ clientDetails }: ContactFormProps) => {
     }));
   };
 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
-      // Simulate form submission (replace with actual API call)
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Submit contact form with color preference
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit form');
+      }
+
+      const result = await response.json();
 
       setIsSubmitted(true);
       toast({
@@ -53,7 +66,13 @@ const ContactForm = ({ clientDetails }: ContactFormProps) => {
       });
 
       // Reset form after successful submission
-      setFormData({ name: "", email: "", subject: "", message: "" });
+      setFormData({ 
+        name: "", 
+        email: "", 
+        subject: "", 
+        message: "",
+        colorPreference: "purple" as ColorTheme
+      });
     } catch (error) {
       toast({
         title: "Error sending message",
@@ -151,7 +170,7 @@ const ContactForm = ({ clientDetails }: ContactFormProps) => {
                   <div>
                     <h4 className="font-semibold text-foreground">Instagram</h4>
                     <a
-                      href={clientDetails.socialLinks.instagram}
+                      href= {`https://www.instagram.com/${clientDetails.instagram}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-muted-foreground hover:text-accent transition-colors"
@@ -165,7 +184,7 @@ const ContactForm = ({ clientDetails }: ContactFormProps) => {
           </div>
 
           {/* Contact Form */}
-          <Card className="p-8 bg-card border-border shadow-card">
+          <Card className="p-8 bg-card border-border shadow-card ">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -235,7 +254,7 @@ const ContactForm = ({ clientDetails }: ContactFormProps) => {
               <Button
                 type="submit"
                 disabled={isSubmitting || isSubmitted}
-                className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-300"
+                className={`w-full bg-gradient-primary hover:shadow-glow transition-all duration-300`}
               >
                 {isSubmitting ? (
                   <>
