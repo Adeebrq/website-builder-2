@@ -136,7 +136,9 @@ export const applyTheme = (theme: ColorTheme | string): void => {
   }
   try {
     localStorage.setItem('themeColor', key);
-  } catch {}
+  } catch {
+    // Ignore localStorage errors
+  }
 };
 
 function rgbToHslTokens(rgb: string): string {

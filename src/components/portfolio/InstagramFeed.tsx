@@ -22,8 +22,8 @@ const InstagramFeed = ({ clientDetails }: InstagramFeedProps) => {
     script.async = true;
     script.src = "//www.instagram.com/embed.js";
     script.onload = () => {
-      if ((window as any)?.instgrm?.Embeds?.process) {
-        (window as any).instgrm.Embeds.process();
+      if ((window as unknown as { instgrm?: { Embeds?: { process?: () => void } } })?.instgrm?.Embeds?.process) {
+        (window as unknown as { instgrm: { Embeds: { process: () => void } } }).instgrm.Embeds.process();
       }
     };
     document.body.appendChild(script);

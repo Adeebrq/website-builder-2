@@ -77,19 +77,19 @@ export default function RegisterPage() {
       
       case 'phone':
         if (!value.trim()) return 'Phone number is required';
-        if (!/^\+?[\d\s\-\(\)]{10,}$/.test(value)) return 'Please enter a valid phone number';
+        if (!/^\+?[\d\s\-()]{10,}$/.test(value)) return 'Please enter a valid phone number';
         return '';
       
       case 'instagram_handle':
-        if (value && !/^@?[a-zA-Z0-9_\.]{1,30}$/.test(value)) return 'Please enter a valid Instagram handle';
+        if (value && !/^@?[a-zA-Z0-9_.]{1,30}$/.test(value)) return 'Please enter a valid Instagram handle';
         return '';
       
       case 'linkedin_url':
-        if (value && !/^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9\-]+\/?$/.test(value)) return 'Please enter a valid LinkedIn URL';
+        if (value && !/^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-]+\/?$/.test(value)) return 'Please enter a valid LinkedIn URL';
         return '';
       
       case 'whatsapp_phone':
-        if (value && !/^\+?[\d\s\-\(\)]{10,}$/.test(value)) return 'Please enter a valid phone number';
+        if (value && !/^\+?[\d\s\-()]{10,}$/.test(value)) return 'Please enter a valid phone number';
         return '';
       
       default:
@@ -262,10 +262,10 @@ export default function RegisterPage() {
       });
 
       router.push(`/thank-you`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error creating portfolio",
-        description: error.message || "Please check your Supabase configuration",
+        description: error instanceof Error ? error.message : "Please check your Supabase configuration",
         variant: "destructive",
       });
     } finally {
@@ -504,7 +504,7 @@ export default function RegisterPage() {
             <div className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="instagram_handle" className="text-foreground font-medium">
-                  Instagram Handle
+                  Instagram Handle (Do not include the @)
                 </Label>
                 <Input
                   id="instagram_handle"
@@ -512,7 +512,7 @@ export default function RegisterPage() {
                   type="text"
                   value={formData.instagram_handle}
                   onChange={handleChange}
-                  placeholder="@johndoe"
+                  placeholder="johndoe"
                   className={`bg-background border-border focus:border-primary ${
                     errors.instagram_handle ? 'border-destructive focus:border-destructive' : ''
                   }`}

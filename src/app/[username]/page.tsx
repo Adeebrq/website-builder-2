@@ -27,7 +27,7 @@ interface UserData {
   avatar_url: string | null;
   template: string;
   instagram_posts: string[] | null;
-  linkedin_posts: any[] | null;
+  linkedin_posts: { url: string; height: number }[] | null;
   created_at: string;
   updated_at: string;
   color_preference?: ColorTheme | null;
@@ -38,19 +38,7 @@ export default function UserPortfolio() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Fix: Add null check for params
-  if (!params?.username) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-hero">
-        <div className="text-center">
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  const username = params.username as string;
+  const username = params?.username as string;
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -75,11 +63,23 @@ export default function UserPortfolio() {
     }
   }, [username]);
 
-  // Apply user's saved theme color (must be before any early returns to keep hook order stable)
+  // Apply user's saved theme color
   useEffect(() => {
     const color = (userData?.color_preference as ColorTheme) || 'purple';
     applyTheme(color);
   }, [userData?.color_preference]);
+
+  // Fix: Add null check for params
+  if (!params?.username) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-hero">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

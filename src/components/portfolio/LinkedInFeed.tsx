@@ -1,11 +1,16 @@
 import { Linkedin } from "lucide-react";
+interface LinkedInPost {
+  url: string;
+  height: number;
+}
+
 interface LinkedInFeedProps {
   clientDetails: {
     socialLinks: {
       linkedin: string;
     };
     embeddedPosts: {
-      linkedin: any[];
+      linkedin: LinkedInPost[];
     };
   };
 }

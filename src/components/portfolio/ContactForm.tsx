@@ -66,12 +66,11 @@ const ContactForm = ({ clientDetails }: ContactFormProps) => {
       });
 
       // Reset form after successful submission
-      setFormData({ 
+      setFormData({
         name: "", 
         email: "", 
         subject: "", 
-        message: "",
-        colorPreference: "purple" as ColorTheme
+        message: ""
       });
     } catch (error) {
       toast({

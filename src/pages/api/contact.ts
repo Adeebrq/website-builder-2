@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Check if user exists by email, if not create a new user
-    let { data: existingUser, error: userCheckError } = await supabase
+    const { data: existingUser, error: userCheckError } = await supabase
       .from('users')
       .select('id, username')
       .eq('email', email)

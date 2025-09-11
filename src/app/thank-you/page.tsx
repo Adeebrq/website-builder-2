@@ -4,16 +4,10 @@ import { Card } from "@/components/ui/card";
 import { Clock, Mail, CheckCircle, Home } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-interface ThankYouPageProps {
-  username?: string;
-  name?: string;
-  email?: string;
-}
-
-export default function ThankYouPage({ username = "username", name = "Your", email = "your email" }: ThankYouPageProps) {
+export default function ThankYouPage() {
   const router = useRouter();
   
-//   const portfolioUrl = `${username}.adeebrq.me`;
+//   const portfolioUrl = `username.adeebrq.me`;
 
   const handleGoHome = () => {
     router.push('/register');

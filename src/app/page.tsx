@@ -11,7 +11,7 @@ export default function Page() {
 
   useEffect(()=>{
     router.push("/register")
-  },[])
+  },[router])
 
   return (
     // <div className="min-h-screen bg-gradient-hero">

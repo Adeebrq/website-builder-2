@@ -24,7 +24,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 // Initialize theme on client
 function ThemeInitializer() {
   useEffect(() => {
-    const stored = (typeof window !== 'undefined' && localStorage.getItem('themeColor')) as any;
+    const stored = (typeof window !== 'undefined' && localStorage.getItem('themeColor')) as string | null;
     applyTheme(stored || 'purple');
   }, []);
   return null;
