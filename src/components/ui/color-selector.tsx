@@ -30,7 +30,9 @@ const ColorSelector = ({ selectedColor, onColorChange, className = "" }: ColorSe
         className="w-full p-3 bg-background border border-border rounded-lg flex items-center justify-between hover:border-primary transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className={`w-6 h-6 rounded-full ${colorThemes[selectedColor].preview}`}></div>
+          <div className={`w-6 h-6 rounded-full ${colorThemes[selectedColor].preview}`}
+            suppressHydrationWarning={true}
+          ></div>
           <span className="text-foreground">{colorThemes[selectedColor].name}</span>
         </div>
         <div className="text-muted-foreground">

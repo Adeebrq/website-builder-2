@@ -38,7 +38,23 @@ export default function RegisterPage() {
     return (localStorage.getItem('themeColor') as ColorTheme) || 'purple';
   });
 
-  const validateField = (name: string, value: string): string => {
+  const checkUsernameAvailability = async (username: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('username')
+        .eq('username', username)
+        .single();
+      
+      // If no error and data exists, username is taken
+      return !data;
+    } catch (error) {
+      // If error (like no rows found), username is available
+      return true;
+    }
+  };
+
+  const validateField = async (name: string, value: string): Promise<string> => {
     switch (name) {
       case 'username':
         if (!value.trim()) return 'Domain name is required';
@@ -46,6 +62,13 @@ export default function RegisterPage() {
         if (!/^[a-zA-Z0-9_-]+$/.test(value)) return 'Domain name can only contain letters, numbers, hyphens, and underscores';
         if (value.length < 3) return 'Domain name must be at least 3 characters long';
         if (value.length > 30) return 'Domain name must be less than 30 characters';
+        
+        // Check if username is available
+        {
+          const isAvailable = await checkUsernameAvailability(value);
+          if (!isAvailable) return 'This domain name is already taken. Please choose another one.';
+        }
+        
         return '';
       
       case 'name':
@@ -81,7 +104,12 @@ export default function RegisterPage() {
         return '';
       
       case 'instagram_handle':
-        if (value && !/^@?[a-zA-Z0-9_.]{1,30}$/.test(value)) return 'Please enter a valid Instagram handle';
+        if (value) {
+          if (/\s/.test(value)) return 'Instagram handle cannot contain spaces';
+          if (value.startsWith('@')) return 'Instagram handle should not start with @';
+          if (!/^[a-zA-Z0-9_.]+$/.test(value)) return 'Instagram handle can only contain letters, numbers, periods, and underscores';
+          if (value.length > 30) return 'Instagram handle must be less than 30 characters';
+        }
         return '';
       
       case 'linkedin_url':
@@ -97,25 +125,25 @@ export default function RegisterPage() {
     }
   };
 
-  const validateForm = (): boolean => {
+  const validateForm = async (): Promise<boolean> => {
     const newErrors: Record<string, string> = {};
     
     // Validate required fields
     const requiredFields = ['username', 'name', 'title', 'bio', 'tagline', 'email', 'phone'];
-    requiredFields.forEach(field => {
-      const error = validateField(field, formData[field as keyof typeof formData]);
+    for (const field of requiredFields) {
+      const error = await validateField(field, formData[field as keyof typeof formData]);
       if (error) newErrors[field] = error;
-    });
+    }
 
     // Validate optional fields if they have values
     const optionalFields = ['instagram_handle', 'linkedin_url', 'whatsapp_phone'];
-    optionalFields.forEach(field => {
+    for (const field of optionalFields) {
       const value = formData[field as keyof typeof formData];
       if (value) {
-        const error = validateField(field, value);
+        const error = await validateField(field, value);
         if (error) newErrors[field] = error;
       }
-    });
+    }
 
     // Validate avatar file
     if (avatarFile) {
@@ -140,6 +168,38 @@ export default function RegisterPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    
+    // Special handling for Instagram handle
+    if (name === 'instagram_handle') {
+      // Show toast for validation errors in real-time
+      if (value && /\s/.test(value)) {
+        toast({
+          title: "Invalid Instagram handle",
+          description: "Instagram handles cannot contain spaces",
+          variant: "destructive",
+        });
+        return; // Don't update state
+      }
+      
+      if (value && value.startsWith('@')) {
+        toast({
+          title: "Invalid Instagram handle",
+          description: "Please don't include the @ symbol",
+          variant: "destructive",
+        });
+        return; // Don't update state
+      }
+      
+      if (value && !/^[a-zA-Z0-9_.]*$/.test(value)) {
+        toast({
+          title: "Invalid Instagram handle",
+          description: "Only letters, numbers, periods, and underscores are allowed",
+          variant: "destructive",
+        });
+        return; // Don't update state
+      }
+    }
+    
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -191,7 +251,7 @@ export default function RegisterPage() {
     e.preventDefault();
     
     // Validate form before submission
-    if (!validateForm()) {
+    if (!(await validateForm())) {
       toast({
         title: "Website creation failed!",
         description: "Some fields are missing or contain errors. Please review and correct them.",
@@ -368,30 +428,7 @@ export default function RegisterPage() {
             <h2 className="text-lg font-semibold text-foreground mb-6">Personal Information</h2>
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="username" className="text-foreground font-medium">
-                    Username <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="username"
-                    name="username"
-                    type="text"
-                    required
-                    value={formData.username}
-                    onChange={handleChange}
-                    placeholder="johndoe"
-                    className={`bg-background border-border focus:border-primary ${
-                      errors.username ? 'border-destructive focus:border-destructive' : ''
-                    }`}
-                  />
-                  {errors.username && (
-                    <p className="text-sm text-destructive">{errors.username}</p>
-                  )}
-                  <p className="text-sm text-muted-foreground">
-                    Your portfolio URL: <span className="font-mono text-primary">profile.cruxcreations.com/{formData.username || 'username'}</span>
-                  </p>
-                </div>
-                <div className="space-y-2">
+              <div className="space-y-2">
                   <Label htmlFor="name" className="text-foreground font-medium">
                     Full Name <span className="text-destructive">*</span>
                   </Label>
@@ -410,6 +447,29 @@ export default function RegisterPage() {
                   {errors.name && (
                     <p className="text-sm text-destructive">{errors.name}</p>
                   )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="username" className="text-foreground font-medium">
+                    Portfolio URL <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="username"
+                    name="username"
+                    type="text"
+                    required
+                    value={formData.username.toLowerCase()}
+                    onChange={handleChange}
+                    placeholder="johndoe"
+                    className={`bg-background border-border focus:border-primary ${
+                      errors.username ? 'border-destructive focus:border-destructive' : ''
+                    }`}
+                  />
+                  {errors.username && (
+                    <p className="text-sm text-destructive">{errors.username}</p>
+                  )}
+                  <p className="text-sm text-muted-foreground">
+                    Your portfolio URL: <span className="font-mono text-primary">profile.cruxcreations.com/{formData.username || 'username'}</span>
+                  </p>
                 </div>
               </div>
 
@@ -552,6 +612,9 @@ export default function RegisterPage() {
                 {errors.instagram_handle && (
                   <p className="text-sm text-destructive">{errors.instagram_handle}</p>
                 )}
+                <p className="text-sm text-muted-foreground">
+                  Only letters, numbers, periods (.) and underscores (_) are allowed. No spaces or @ symbol.
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
