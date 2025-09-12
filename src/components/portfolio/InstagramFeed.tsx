@@ -45,7 +45,7 @@ const InstagramFeed = ({ clientDetails }: InstagramFeedProps) => {
             Stay updated with my recent work
           </p>
           <a
-            href={clientDetails.socialLinks.instagram}
+          href= {`https://www.instagram.com/${clientDetails.instagram}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-accent hover:text-primary transition-colors"

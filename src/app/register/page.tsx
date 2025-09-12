@@ -261,6 +261,38 @@ export default function RegisterPage() {
         // description: `Your portfolio is now available at ${formData.username}.adeebrq.me`,
       });
 
+      // Schedule email to be sent after 1 minute
+      console.log('📧 Starting email scheduling process...');
+      try {
+        console.log('📧 Making API call to /api/send-delayed-email');
+        const response = await fetch('/api/send-delayed-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            formData: {
+              name: formData.name,
+              email: formData.email,
+              username: formData.username,
+            },
+            submissionTime: new Date().toISOString(),
+          }),
+        });
+        
+        console.log('📧 API response status:', response.status);
+        
+        if (response.ok) {
+          const result = await response.json();
+          console.log('✅ Email scheduled successfully:', result);
+        } else {
+          const errorText = await response.text();
+          console.error('❌ Email scheduling failed:', errorText);
+        }
+      } catch (error) {
+        console.error('❌ Failed to schedule email:', error);
+      }
+
       router.push(`/thank-you`);
     } catch (error: unknown) {
       toast({

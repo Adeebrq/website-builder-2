@@ -1,13 +1,5 @@
-"use client";
-import { useEffect, useState } from "react";
 import { supabase } from "@/lib/dataBase";
-import Hero from "@/components/portfolio/Hero";
-import InstagramFeed from "@/components/portfolio/InstagramFeed";
-import LinkedInFeed from "@/components/portfolio/LinkedInFeed";
-import ContactForm from "@/components/portfolio/ContactForm";
-import Footer from "@/components/portfolio/Footer";
-import { useParams } from "next/navigation";
-import { applyTheme } from "@/lib/colorThemes";
+import UserPortfolioClient from "./UserPortfolioClient";
 import type { ColorTheme } from "@/lib/colorThemes";
 
 // Define the user data type
@@ -33,66 +25,45 @@ interface UserData {
   color_preference?: ColorTheme | null;
 }
 
-export default function UserPortfolio() {
-  const params = useParams();
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  const username = params?.username as string;
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('username', username)
-          .single();
-
-        if (error) throw error;
-        setUserData(data as UserData);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (username) {
-      fetchUserData();
-    }
-  }, [username]);
-
-  // Apply user's saved theme color
-  useEffect(() => {
-    const color = (userData?.color_preference as ColorTheme) || 'purple';
-    applyTheme(color);
-  }, [userData?.color_preference]);
-
-  // Fix: Add null check for params
-  if (!params?.username) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-hero">
-        <div className="text-center">
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
+// Generate static params for all existing usernames
+export async function generateStaticParams() {
+  try {
+    const { data: users } = await supabase
+      .from('users')
+      .select('username');
+    
+    if (!users) return [];
+    
+    return users.map((user) => ({
+      username: user.username,
+    }));
+  } catch (error) {
+    console.error('Error fetching users for static params:', error);
+    return [
+      { username: 'demo' },
+      { username: 'example' }
+    ];
   }
+}
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-hero">
-        <div className="text-center">
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading portfolio...</p>
-        </div>
-      </div>
-    );
-  }
+// REMOVE this line - it conflicts with static export
+// export const dynamic = 'force-dynamic';
 
-  if (!userData) {
+interface UserPortfolioProps {
+  params: Promise<{ username: string }>;
+}
+
+export default async function UserPortfolio({ params }: UserPortfolioProps) {
+  const { username } = await params;
+
+  // Fetch user data on the server
+  const { data: userData, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('username', username)
+    .single();
+
+  if (error || !userData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-hero">
         <div className="text-center">
@@ -108,10 +79,8 @@ export default function UserPortfolio() {
     );
   }
 
-  // TypeScript type assertion to ensure userData is properly typed
   const validUserData: UserData = userData;
 
-  // Transform user data to match the expected format
   const clientDetails = {
     name: validUserData.name,
     title: validUserData.title || "Professional",
@@ -133,14 +102,9 @@ export default function UserPortfolio() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="flex-1">
-        <Hero clientDetails={clientDetails} />
-        <InstagramFeed clientDetails={clientDetails} />
-        <LinkedInFeed clientDetails={clientDetails} />
-        <ContactForm clientDetails={clientDetails} />
-      </div>
-      <Footer />
-    </div>
+    <UserPortfolioClient 
+      clientDetails={clientDetails} 
+      colorPreference={validUserData.color_preference || 'purple'} 
+    />
   );
 }
