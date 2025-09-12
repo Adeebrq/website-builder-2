@@ -25,7 +25,7 @@ export default function Page() {
             Create your personalized portfolio website in minutes
           </p>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-12">
-            Get your own subdomain like <span className="text-primary font-semibold">yourname.adeebrq.me</span> and showcase your work professionally.
+            Get your own subdomain like <span className="text-primary font-semibold">profile.cruxcreations.com/yourname</span> and showcase your work professionally by crux.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
@@ -34,7 +34,7 @@ export default function Page() {
                 size="lg" 
                 className="bg-gradient-primary hover:shadow-glow transition-all duration-300"
               >
-                Create Your Portfolio
+                Create Your Portfolio now
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
@@ -54,7 +54,7 @@ export default function Page() {
               <Globe className="w-8 h-8 text-primary mb-4 mx-auto" />
               <h3 className="text-lg font-semibold text-foreground mb-2">Custom Domain</h3>
               <p className="text-muted-foreground text-sm">
-                Get your own subdomain like yourname.adeebrq.me
+                Get your own domain like profile.cruxcreations.com/yourname
               </p>
             </Card>
             
