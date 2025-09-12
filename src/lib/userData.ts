@@ -43,3 +43,23 @@ export async function getUsersData(): Promise<UserData[]> {
     return [];
   }
 }
+
+export async function getUserByUsername(username: string): Promise<UserData | null> {
+  try {
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('username', username)
+      .single();
+    
+    if (error) {
+      console.error('Error fetching user:', error);
+      return null;
+    }
+    
+    return user;
+  } catch (error) {
+    console.error('Error fetching user by username:', error);
+    return null;
+  }
+}

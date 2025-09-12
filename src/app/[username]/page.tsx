@@ -1,22 +1,6 @@
 import UserPortfolioClient from "./UserPortfolioClient";
-import { getUsersData, type UserData } from "@/lib/userData";
-
-// Generate static params for all existing usernames
-export async function generateStaticParams() {
-  try {
-    const users = await getUsersData();
-    
-    return users.map((user) => ({
-      username: user.username,
-    }));
-  } catch (error) {
-    console.error('Error generating static params:', error);
-    return [
-      { username: 'demo' },
-      { username: 'example' }
-    ];
-  }
-}
+import { getUserByUsername, type UserData } from "@/lib/userData";
+import Link from "next/link";
 
 interface UserPortfolioProps {
   params: Promise<{ username: string }>;
@@ -25,11 +9,8 @@ interface UserPortfolioProps {
 export default async function UserPortfolio({ params }: UserPortfolioProps) {
   const { username } = await params;
 
-  // Get all users data statically
-  const users = await getUsersData();
-  
-  // Find the specific user
-  const userData = users.find(user => user.username === username);
+  // Get user data dynamically
+  const userData = await getUserByUsername(username);
 
   if (!userData) {
     return (
@@ -39,9 +20,9 @@ export default async function UserPortfolio({ params }: UserPortfolioProps) {
           <p className="text-muted-foreground mb-4">
             The portfolio for "{username}" doesn't exist.
           </p>
-          <a href="/" className="text-primary hover:text-primary/80 underline">
+          <Link href="/" className="text-primary hover:text-primary/80 underline">
             Go back to home
-          </a>
+          </Link>
         </div>
       </div>
     );
