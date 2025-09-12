@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(request: NextRequest) {
   try {
     const { formData, submissionTime } = await request.json();
@@ -13,6 +11,18 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Check if Resend API key is available
+    if (!process.env.RESEND_API_KEY) {
+      console.log('Resend API key not found, skipping email send');
+      return NextResponse.json({
+        success: true,
+        message: 'Email functionality not configured',
+        emailId: null,
+      });
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     // Calculate delay (2 minutes from submission time)
     const submissionDate = new Date(submissionTime);
