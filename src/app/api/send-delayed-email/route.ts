@@ -75,8 +75,6 @@ export async function POST(request: NextRequest) {
       scheduledAt: delayTime.toISOString(),
     });
 
-    https://profile.cruxcreations.com/${formData.username}
-
     if (error) {
       console.error('Resend error:', error);
       return NextResponse.json(
