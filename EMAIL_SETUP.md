@@ -77,3 +77,5 @@ curl -X POST http://localhost:3000/api/test-email \
 - Check server logs for any API errors
 - Ensure environment variables are set correctly
 
+
+

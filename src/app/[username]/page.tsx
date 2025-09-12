@@ -25,29 +25,42 @@ interface UserData {
   color_preference?: ColorTheme | null;
 }
 
+export async function getData(): Promise<UserData[]> {
+  try {
+    const { data: users, error } = await supabase
+      .from('users')
+      .select('*');
+    
+    console.log(users);
+    
+    if (error) {
+      console.error('Error fetching users:', error);
+      return [];
+    }
+    
+    return users || [];
+  } catch (error) {
+    console.error('Error fetching users for static params:', error);
+    return [];
+  }
+}
+
 // Generate static params for all existing usernames
 export async function generateStaticParams() {
   try {
-    const { data: users } = await supabase
-      .from('users')
-      .select('username');
-    
-    if (!users) return [];
+    const users = await getData();
     
     return users.map((user) => ({
       username: user.username,
     }));
   } catch (error) {
-    console.error('Error fetching users for static params:', error);
+    console.error('Error generating static params:', error);
     return [
       { username: 'demo' },
       { username: 'example' }
     ];
   }
 }
-
-// REMOVE this line - it conflicts with static export
-// export const dynamic = 'force-dynamic';
 
 interface UserPortfolioProps {
   params: Promise<{ username: string }>;
@@ -56,14 +69,13 @@ interface UserPortfolioProps {
 export default async function UserPortfolio({ params }: UserPortfolioProps) {
   const { username } = await params;
 
-  // Fetch user data on the server
-  const { data: userData, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('username', username)
-    .single();
+  // Get all users data statically
+  const users = await getData();
+  
+  // Find the specific user
+  const userData = users.find(user => user.username === username);
 
-  if (error || !userData) {
+  if (!userData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-hero">
         <div className="text-center">
@@ -79,32 +91,30 @@ export default async function UserPortfolio({ params }: UserPortfolioProps) {
     );
   }
 
-  const validUserData: UserData = userData;
-
   const clientDetails = {
-    name: validUserData.name,
-    title: validUserData.title || "Professional",
-    bio: validUserData.bio || "Welcome to my portfolio",
-    tagline: validUserData.tagline || "Available for freelance projects and collaborations",
-    email: validUserData.email || "contact@example.com",
-    phone: validUserData.phone || "+1234567890",
-    instagram: validUserData.instagram_handle || "username",
-    avatar_url: validUserData.avatar_url || undefined,
+    name: userData.name,
+    title: userData.title || "Professional",
+    bio: userData.bio || "Welcome to my portfolio",
+    tagline: userData.tagline || "Available for freelance projects and collaborations",
+    email: userData.email || "contact@example.com",
+    phone: userData.phone || "+1234567890",
+    instagram: userData.instagram_handle || "username",
+    avatar_url: userData.avatar_url || undefined,
     socialLinks: {
-      instagram: validUserData.instagram_url || "#",
-      linkedin: validUserData.linkedin_url || "#",
-      whatsapp: validUserData.whatsapp_url || "#"
+      instagram: userData.instagram_url || "#",
+      linkedin: userData.linkedin_url || "#",
+      whatsapp: userData.whatsapp_url || "#"
     },
     embeddedPosts: {
-      instagram: validUserData.instagram_posts || [],
-      linkedin: validUserData.linkedin_posts || []
+      instagram: userData.instagram_posts || [],
+      linkedin: userData.linkedin_posts || []
     }
   };
 
   return (
     <UserPortfolioClient 
       clientDetails={clientDetails} 
-      colorPreference={validUserData.color_preference || 'purple'} 
+      colorPreference={userData.color_preference || 'purple'} 
     />
   );
 }
