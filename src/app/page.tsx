@@ -62,7 +62,7 @@ export default function Page() {
               <Zap className="w-8 h-8 text-primary mb-4 mx-auto" />
               <h3 className="text-lg font-semibold text-foreground mb-2">Fast & Modern</h3>
               <p className="text-muted-foreground text-sm">
-                Built with Next.js for lightning-fast performance
+                Built with Next.js for lightning-fast performance.
               </p>
             </Card>
           </div>
