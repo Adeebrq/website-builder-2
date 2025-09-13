@@ -19,7 +19,7 @@ export default function Page() {
       <section className="min-h-screen flex items-center justify-center px-6 py-20">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl md:text-7xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-6">
-            FREE PORTFOLIO WEBSITE IN 4 MINUTES
+            FREE PORTFOLIO WEBSITE IN 10 MINUTES
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground font-light mb-8">
             Create your personalized portfolio website in minutes
