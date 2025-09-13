@@ -450,7 +450,7 @@ export default function RegisterPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="username" className="text-foreground font-medium">
-                    Portfolio URL <span className="text-destructive">*</span>
+                    First name (will be a part of your domain) <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="username"
